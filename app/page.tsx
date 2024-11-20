@@ -96,12 +96,12 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-8">
+      {/* <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">AI Document Assistant</h1>
         <div>
           <ThemeToggle />
         </div>
-      </div>
+      </div> */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <Card className="p-6 mb-8">

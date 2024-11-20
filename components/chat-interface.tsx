@@ -1,10 +1,25 @@
 import { ChatMessage, DocumentMetadata } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Card } from "./ui/card";
-import { FileText, Loader2, Send } from "lucide-react";
+import {
+  ArrowUp,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Loader2,
+  Send,
+  StopCircle,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { Input } from "./ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ChatInterfaceProps {
   onSendMessage: (message: string, documentId: string) => Promise<string>;
@@ -30,7 +45,7 @@ export function ChatInterface({
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>("");
-
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   //Load chat history when current document changes
   useEffect(() => {
     if (currentDocument?.id) {
@@ -142,7 +157,7 @@ export function ChatInterface({
       </ScrollArea>
 
       <div className="p-4 border-t">
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -157,6 +172,68 @@ export function ChatInterface({
           <Button onClick={handleSend} disabled={loading || !currentDocument}>
             {loading ? <Loader2 className="animate-spin" /> : <Send />}
           </Button>
+        </div> */}
+        <div className="flex items-center space-x-2 flex-col relative">
+          <Textarea
+            className={`pr-24 resize-none rounded-xl w-full custom-scrollbar ${
+              isExpanded ? "min-h-[200px]" : "min-h-[48px]"
+            }`}
+            name="input"
+            rows={1}
+            spellCheck={false}
+            placeholder="Ask a question..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+            disabled={loading || !currentDocument}
+          />
+          <div className="absolute right-2 bottom-1.5 flex space-x-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronUp className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {isExpanded ? "Decrease height" : "Increase height"}
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isExpanded ? "Decrease height" : "Increase height"}</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={loading || !currentDocument}
+                  >
+                    {loading ? (
+                      <StopCircle className="h-4 w-4 animate-pulse" />
+                    ) : (
+                      <ArrowUp className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {loading ? "Stop generating" : "Submit"}
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Submit</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
       </div>
     </Card>
