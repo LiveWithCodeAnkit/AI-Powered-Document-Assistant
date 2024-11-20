@@ -7,7 +7,14 @@ import { Loader2 } from "lucide-react";
 import { ChatInterface } from "@/components/chat-interface";
 import { DocumentMetadata } from "@/lib/types";
 import { DocumentHistory } from "@/components/document-history";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { useOpenAIKey } from "@/provider/OpenAIKeyProvider";
+import CryptoJS from "crypto-js";
+import { OpenAIKeyModal } from "@/components/model/OpenAIKeyModal";
+
+
+const encryptPayload = (payload: any, secret: string) => {
+  return CryptoJS.AES.encrypt(JSON.stringify(payload), secret).toString();
+};
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -16,8 +23,19 @@ export default function Home() {
   const [summary, setSummary] = useState<string>("");
   const [documents, setDocuments] = useState<DocumentMetadata[]>([]);
   const [currentDocument, setCurrentDocument] = useState<DocumentMetadata>();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const { apiKey } = useOpenAIKey();
+
+
+
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
+
+    console.log(apiKey,"apiKey");
+    if (!apiKey || apiKey.trim() === '') { // Check if apiKey is empty or just whitespace
+      setIsModalOpen(true);
+      return;
+    }
     try {
       setError("");
       setUploadProgress(true);
@@ -53,7 +71,7 @@ export default function Home() {
     } finally {
       setUploadProgress(false);
     }
-  }, []);
+  }, [apiKey]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -96,12 +114,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4">
-      {/* <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">AI Document Assistant</h1>
-        <div>
-          <ThemeToggle />
-        </div>
-      </div> */}
+       <OpenAIKeyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <Card className="p-6 mb-8">

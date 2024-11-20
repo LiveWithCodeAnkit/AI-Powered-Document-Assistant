@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/Header";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { OpenAIKeyProvider } from "@/provider/OpenAIKeyProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,10 +38,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-        
-          <Header/>
-          {children}
-        
+          <OpenAIKeyProvider>
+            <Header />
+            {children}
+          </OpenAIKeyProvider>
         </ThemeProvider>
       </body>
     </html>
