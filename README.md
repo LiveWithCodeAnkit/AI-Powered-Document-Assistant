@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# **PDF Upload and Question Answering Application**
 
-## Getting Started
+This application allows users to upload PDF documents, extract content, generate summaries, and perform question-and-answer interactions based on the uploaded content. Users must provide their **OpenAI API key**, which is securely managed and used only during their session.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## **Features**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **PDF Upload**: Users can upload PDF files to process and store their content.
+- **Document Summarization**: Automatically generates a concise summary of uploaded PDFs.
+- **Contextual Question Answering**: Users can ask questions based on the uploaded document's content.
+- **User-Supplied OpenAI API Key**: Users provide their own OpenAI API key via a secure modal.
+- **Data Storage with Pinecone**: Processed document data is securely stored for efficient retrieval.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## **Technologies Used**
 
-## Learn More
+- **Next.js** (latest version) for server-side rendering and API routes.
+- **LangChain** for document parsing and summarization.
+- **Pinecone** for vector database storage and similarity searches.
+- **OpenAI API** for AI-powered summarization and Q&A.
+- **React** for the user interface.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## **Getting Started**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prerequisites
 
-## Deploy on Vercel
+1. **Node.js** (>=16.x) and **npm** or **yarn**.
+2. **Pinecone API Key**: Sign up at [Pinecone](https://www.pinecone.io/).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Installation
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/your-username/your-repo-name.git
+   cd your-repo-name
+
+
+2. **Install Dependencies:**:
+ ```bash
+  npm install
+
+3. **Set Environment Variables:**: Create a .env file in the root directory and add the following variables:
+ PINECONE_API_KEY=<your-pinecone-api-key>
+ PINECONE_INDEX_NAME=<your-pinecone-index-name>
+ SHARED_SECRET=<your-shared-secret>
