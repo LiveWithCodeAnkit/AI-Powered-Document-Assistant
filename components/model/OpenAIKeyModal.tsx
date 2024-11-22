@@ -25,7 +25,7 @@ export function OpenAIKeyModal({ isOpen, onClose }: OpenAIKeyModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enter OpenAI API Key</DialogTitle>
+          <DialogTitle>OpenAI API Key</DialogTitle>
           <DialogDescription>
             Please provide your OpenAI API key to proceed with document upload and processing.
           </DialogDescription>
