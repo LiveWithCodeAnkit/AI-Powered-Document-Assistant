@@ -214,6 +214,9 @@ export function ChatInterface({
                     type="submit"
                     size="icon"
                     disabled={loading || !currentDocument}
+                    onClick={() => {
+                      handleSend();
+                    }}
                   >
                     {loading ? (
                       <StopCircle className="h-4 w-4 animate-pulse" />

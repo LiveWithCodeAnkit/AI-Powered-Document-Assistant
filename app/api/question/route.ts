@@ -15,13 +15,13 @@ const pinecone = new Pinecone({
 
 export async function POST(req: Request) {
   try {
-    const { question, documentId, apiKey: encryptedApiKey } = await req.json();
+    const { question, documentId, apiKey } = await req.json();
 
-    if (!question?.trim() || !documentId|| !encryptedApiKey) {
+    if (!question?.trim() || !documentId) {
       return new Response("Missing question or documentId or openAikey", { status: 400 });
     }
   //  const apiKey = decryptPayload(encryptedApiKey, process.env.SECRET_KEY!);
-    const embeddings = new OpenAIEmbeddings({ openAIApiKey: encryptedApiKey });
+    const embeddings = new OpenAIEmbeddings({ openAIApiKey: apiKey });
 
     const index = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
     const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const contentText = results.map((r) => r.pageContent).join("\n");
 
     const openai = new OpenAI({
-      openAIApiKey: process.env.OPENAI_API_KEY!,
+      openAIApiKey: apiKey!,
     });
 
     const prompt = `You are a helpful AI assistant. Using the following context from a document, 
