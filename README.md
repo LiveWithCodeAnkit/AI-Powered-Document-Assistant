@@ -49,3 +49,38 @@ This application allows users to upload PDF documents, extract content, generate
  PINECONE_API_KEY=<your-pinecone-api-key>
  PINECONE_INDEX_NAME=<your-pinecone-index-name>
  SHARED_SECRET=<your-shared-secret>
+
+## **Usage**
+
+### **Upload a Document**
+
+1. Drag and drop a PDF file onto the upload area.
+2. If you haven’t provided an OpenAI API key, a modal will prompt you to enter it.
+3. View the document's summary upon successful upload.
+
+### **Ask Questions**
+
+1. Select a document and type a question in the Q&A interface.
+2. Receive an AI-generated answer based on the document's content.
+
+
+ ### Application Workflow
+**Client-Side**
+ 1.Users drag and drop a PDF file to upload.
+ 2.If no OpenAI API key is provided, a modal prompts the user to enter it.
+ 3.The OpenAI API key is stored securely in the client context and is never sent to the server.
+ 4.The uploaded file and metadata are securely transmitted to the server.
+
+
+## Server-Side
+The uploaded file is processed with LangChain to:
+
+   Extract the document's content.
+
+   Generate a summary using the user-provided OpenAI API key.
+
+   Split the content into chunks for storage.
+
+Processed data is stored in Pinecone with metadata.
+
+For Q&A, similarity searches are performed using Pinecone, and answers are generated with the user's OpenAI API key.
