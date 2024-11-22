@@ -1,3 +1,4 @@
+// import CryptoJS from "crypto-js";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
@@ -9,19 +10,36 @@ const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
 });
 
+// const decryptPayload = (encrypted: string, secret: string) => {
+//   const bytes = CryptoJS.AES.decrypt(encrypted, secret);
+//   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+// };
+
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
+    const encryptedApiKey = formData.get("apiKey") as string;
 
-    if (!file) {
-      return new Response("No file provided", { status: 400 });
+    if (!file || !encryptedApiKey) {
+      return new Response("Invalid request", { status: 400 });
     }
 
-    //Generate a document id
+    // Decrypt the API key
+   //  const { apiKey } = decryptPayload(encryptedApiKey, process.env.SHARED_SECRET!);
+
+  
+    
+
+    if (!encryptedApiKey) {
+      return new Response("Missing API key", { status: 400 });
+    }
+
+    // Generate a document ID
     const documentId = crypto.randomUUID();
 
-    //convert file to blob
+    // Convert file to blob
     const blob = new Blob([await file.arrayBuffer()], { type: file.type });
 
     // Load and parse PDF
@@ -46,19 +64,13 @@ export async function POST(req: Request) {
     }));
 
     // Generate summary
-    const openai = new OpenAI({
-      openAIApiKey: process.env.OPENAI_API_KEY!,
-    });
-
+    const openai = new OpenAI({ openAIApiKey: encryptedApiKey });
     const summary = await openai.invoke(
       `Summarize the following document: ${splitDocs[0].pageContent}`
     );
 
     // Store in Pinecone with metadata
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY!,
-    });
-
+    const embeddings = new OpenAIEmbeddings({ openAIApiKey: encryptedApiKey });
     const index = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
 
     await PineconeStore.fromDocuments(docsWithMetadata, embeddings, {
@@ -71,9 +83,7 @@ export async function POST(req: Request) {
       pageCount: docs.length,
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    console.error(errorMessage);
-    return new Response(errorMessage, { status: 500 });
+    console.error("Error processing upload:", error);
+    return new Response("Error processing upload", { status: 500 });
   }
 }

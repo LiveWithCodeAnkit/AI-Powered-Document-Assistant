@@ -6,13 +6,10 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  Loader2,
-  Send,
   StopCircle,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import { Input } from "./ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,

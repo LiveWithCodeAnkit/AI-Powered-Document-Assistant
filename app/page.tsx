@@ -8,13 +8,12 @@ import { ChatInterface } from "@/components/chat-interface";
 import { DocumentMetadata } from "@/lib/types";
 import { DocumentHistory } from "@/components/document-history";
 import { useOpenAIKey } from "@/provider/OpenAIKeyProvider";
-import CryptoJS from "crypto-js";
+// import CryptoJS from "crypto-js";
 import { OpenAIKeyModal } from "@/components/model/OpenAIKeyModal";
 
-
-const encryptPayload = (payload: any, secret: string) => {
-  return CryptoJS.AES.encrypt(JSON.stringify(payload), secret).toString();
-};
+// const encryptPayload = (payload: any, secret: string) => {
+//   return CryptoJS.AES.encrypt(JSON.stringify(payload), secret).toString();
+// };
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -23,55 +22,56 @@ export default function Home() {
   const [summary, setSummary] = useState<string>("");
   const [documents, setDocuments] = useState<DocumentMetadata[]>([]);
   const [currentDocument, setCurrentDocument] = useState<DocumentMetadata>();
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { apiKey } = useOpenAIKey();
 
-
-
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-
-    console.log(apiKey,"apiKey");
-    if (!apiKey || apiKey.trim() === '') { // Check if apiKey is empty or just whitespace
-      setIsModalOpen(true);
-      return;
-    }
-    try {
-      setError("");
-      setUploadProgress(true);
-      const formData = new FormData();
-      formData.append("file", acceptedFiles[0]);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to upload document");
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (!apiKey || apiKey.trim() === "") {
+        // Check if apiKey is empty or just whitespace
+        setIsModalOpen(true);
+        return;
       }
+      try {
+        setError("");
+        setUploadProgress(true);
+       // const encryptedApiKey = encryptPayload({ apiKey }, "client-shared-secret");
+        const formData = new FormData();
+        formData.append("file", acceptedFiles[0]);
+        formData.append("apiKey", apiKey);
 
-      const data = await response.json();
-      setSummary(data.summary);
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
 
-      const newDoc: DocumentMetadata = {
-        id: data.documentId,
-        filename: acceptedFiles[0].name,
-        uploadedAt: new Date(),
-        summary: data.summary,
-        pageCount: data.pageCount,
-        fileSize: acceptedFiles[0].size,
-      };
-      setDocuments((prev) => [...prev, newDoc]);
-      setCurrentDocument(newDoc);
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
-    } finally {
-      setUploadProgress(false);
-    }
-  }, [apiKey]);
+        if (!response.ok) {
+          throw new Error("Failed to upload document");
+        }
+
+        const data = await response.json();
+        setSummary(data.summary);
+
+        const newDoc: DocumentMetadata = {
+          id: data.documentId,
+          filename: acceptedFiles[0].name,
+          uploadedAt: new Date(),
+          summary: data.summary,
+          pageCount: data.pageCount,
+          fileSize: acceptedFiles[0].size,
+        };
+        setDocuments((prev) => [...prev, newDoc]);
+        setCurrentDocument(newDoc);
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : "An unknown error occurred"
+        );
+      } finally {
+        setUploadProgress(false);
+      }
+    },
+    [apiKey]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -82,11 +82,13 @@ export default function Home() {
   const handleMessage = async (message: string, documentId: string) => {
     try {
       setLoading(true);
+      //const encryptedApiKey = encryptPayload({ apiKey }, "client-shared-secret");
       const response = await fetch("/api/question", {
         method: "POST",
         body: JSON.stringify({
           question: message,
           documentId,
+          apiKey: apiKey,
         }),
       });
 
@@ -114,19 +116,37 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4">
-       <OpenAIKeyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <OpenAIKeyModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <Card className="p-6 mb-8">
             <div
-              {...getRootProps()}
+              {...getRootProps({
+                onClick: (event) => {
+                  if (!apiKey || apiKey.trim() === "") {
+                    event.preventDefault(); // Prevent the default click action
+                    setIsModalOpen(true);
+                  }
+                },
+              })}
               className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                 isDragActive
                   ? "border-blue-500"
                   : "border-gray-300 dark:border-gray-700"
               }`}
             >
-              <input {...getInputProps()} />
+              <input
+                {...getInputProps({
+                  onClick: (event) => {
+                    if (!apiKey || apiKey.trim() === "") {
+                      event.preventDefault(); // Block the input from opening file selection dialog
+                    }
+                  },
+                })}
+              />
               {uploadProgress ? (
                 <div className="flex items-center justify-center gap-2">
                   <Loader2 className="animate-spin size-4" />

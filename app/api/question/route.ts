@@ -2,21 +2,26 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { OpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
 import { NextResponse } from "next/server";
+// import CryptoJS from "crypto-js";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
 });
 
+// const decryptPayload = (encrypted: string, secret: string) => {
+//   const bytes = CryptoJS.AES.decrypt(encrypted, secret);
+//   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+// };
+
 export async function POST(req: Request) {
   try {
-    const { question, documentId } = await req.json();
+    const { question, documentId, apiKey: encryptedApiKey } = await req.json();
 
-    if (!question?.trim() || !documentId) {
-      return new Response("Missing question or documentId", { status: 400 });
+    if (!question?.trim() || !documentId|| !encryptedApiKey) {
+      return new Response("Missing question or documentId or openAikey", { status: 400 });
     }
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY!,
-    });
+  //  const apiKey = decryptPayload(encryptedApiKey, process.env.SECRET_KEY!);
+    const embeddings = new OpenAIEmbeddings({ openAIApiKey: encryptedApiKey });
 
     const index = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
     const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
