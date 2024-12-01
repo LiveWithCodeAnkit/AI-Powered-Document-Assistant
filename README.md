@@ -83,4 +83,4 @@ The uploaded file is processed with LangChain to:
 
 Processed data is stored in Pinecone with metadata.
 
-For Q&A, similarity searches are performed using Pinecone, and answers are generated with the user's OpenAI API key.
+For Q&A, similarity searches are performed using Pinecone, and answers are generated with the user's OpenAI API key
