@@ -17,7 +17,11 @@ export async function POST(req: Request) {
     }
 
     // Step 1: Initialize OpenAI embeddings for Pinecone
-    const embeddings = new OpenAIEmbeddings({ openAIApiKey: apiKey });
+    const embeddings = new OpenAIEmbeddings({
+      openAIApiKey: apiKey,
+      model: "text-embedding-3-small",
+      dimensions: 512,
+    });
 
     // Step 2: Retrieve relevant document snippets from Pinecone
     const index = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
