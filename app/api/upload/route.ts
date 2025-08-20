@@ -70,7 +70,11 @@ export async function POST(req: Request) {
     );
 
     // Store in Pinecone with metadata
-    const embeddings = new OpenAIEmbeddings({ openAIApiKey: encryptedApiKey });
+    const embeddings = new OpenAIEmbeddings({
+      openAIApiKey: encryptedApiKey,
+      model: "text-embedding-3-small",
+      dimensions: 512,
+    });
     const index = pinecone.Index(process.env.PINECONE_INDEX_NAME!);
 
     await PineconeStore.fromDocuments(docsWithMetadata, embeddings, {
